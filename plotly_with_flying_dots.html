@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Plotly Graph with Flying Dots</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: black; }
+    #plotly-div { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+    #p5-canvas { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; }
+  </style>
+</head>
+<body>
+<div id="plotly-div"></div>
+<script>
+// Plotly graph data
+// Define a default Plotly layout
+var layout = {
+  margin: {l:0, r:0, b:0, t:0},
+  paper_bgcolor: 'black',
+  plot_bgcolor: 'black',
+  scene: {
+    xaxis: {color: 'white'},
+    yaxis: {color: 'white'},
+    zaxis: {color: 'white'}
+  }
+};
+
+fetch('graph_data.json')
+  .then(response => response.json())
+  .then(data => {
+    Plotly.newPlot('plotly-div', data, layout, {responsive: true});
+  })
+  .catch(() => {
+    document.getElementById('plotly-div').innerHTML = '<div style="color:white;text-align:center;padding-top:40vh;">Could not load graph data.</div>';
+  });
+
+// p5.js flying dots animation
+let dots = [];
+function setup() {
+  let cnv = createCanvas(windowWidth, windowHeight);
+  cnv.id('p5-canvas');
+  for (let i = 0; i < 30; i++) {
+    dots.push({
+      x: random(width),
+      y: random(height),
+      dx: random(-2,2),
+      dy: random(-2,2),
+      r: random(6,12)
+    });
+  }
+  noStroke();
+}
+
+function draw() {
+  clear();
+  for (let dot of dots) {
+    fill(255, 255, 0, 180);
+    ellipse(dot.x, dot.y, dot.r);
+    dot.x += dot.dx;
+    dot.y += dot.dy;
+    if (dot.x < 0 || dot.x > width) dot.dx *= -1;
+    if (dot.y < 0 || dot.y > height) dot.dy *= -1;
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+// ...existing p5.js code for flying dots...
+// In your draw() function, only keep the dot animation code:
+// for (let dot of dots) {
+//   ...animation logic...
+// }
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>
