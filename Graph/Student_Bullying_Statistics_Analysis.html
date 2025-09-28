@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Plotly Graph with Flying Dots</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: black; font-family: 'Arial', sans-serif; }
+    #header { 
+      position: absolute; 
+      top: 20px; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      color: white; 
+      text-align: center; 
+      z-index: 3;
+      font-size: 28px;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.5);
+      padding: 15px 30px;
+      border-radius: 10px;
+      border: 2px solid #4CAF50;
+    }
+    #subtitle {
+      font-size: 16px;
+      margin-top: 8px;
+      color: #cccccc;
+      font-weight: normal;
+    }
+    #plotly-div { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+    #p5-canvas { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; }
+  </style>
+</head>
+<body>
+<div id="header">
+  Student Bullying Statistics Analysis
+  <div id="subtitle">Interactive 3D Visualization of Reported Bullying Types</div>
+</div>
+<div id="plotly-div"></div>
+<script>
+// Plotly graph data
+// Define a default Plotly layout with proper axis labels
+var layout = {
+  margin: {l:60, r:60, b:80, t:120},
+  paper_bgcolor: 'black',
+  plot_bgcolor: 'black',
+  scene: {
+    xaxis: {
+      title: {
+        text: 'Types of Bullying',
+        font: {color: 'white', size: 16}
+      },
+      tickvals: [0, 1, 2, 3, 4],
+      ticktext: ['Rumors', 'Name-calling', 'Physical', 'Exclusion', 'Cyberbullying'],
+      tickfont: {color: 'white', size: 12},
+      gridcolor: 'rgba(255,255,255,0.2)',
+      backgroundcolor: 'black',
+      showbackground: true
+    },
+    yaxis: {
+      title: {
+        text: 'Survey Response',
+        font: {color: 'white', size: 16}
+      },
+      tickfont: {color: 'white', size: 12},
+      gridcolor: 'rgba(255,255,255,0.2)',
+      backgroundcolor: 'black',
+      showbackground: true,
+      range: [-0.5, 0.5]
+    },
+    zaxis: {
+      title: {
+        text: 'Percentage of Students (%)',
+        font: {color: 'white', size: 16}
+      },
+      tickfont: {color: 'white', size: 12},
+      gridcolor: 'rgba(255,255,255,0.2)',
+      backgroundcolor: 'black',
+      showbackground: true,
+      range: [0, 25]
+    },
+    camera: {
+      eye: {x: 1.5, y: 1.5, z: 1.2}
+    }
+  },
+  font: {color: 'white'}
+};
+
+// Embedded graph data (instead of fetching from external file)
+var data = [{"type": "scatter3d", "mode": "lines+markers", "x": [0, 0], "y": [0, 0], "z": [0, 13.0], "marker": {"size": 8, "color": "#6fa8dc"}, "line": {"color": "#6fa8dc", "width": 15}, "name": "Rumors: 13.0%"}, {"type": "scatter3d", "mode": "lines+markers", "x": [1, 1], "y": [0, 0], "z": [0, 11.9], "marker": {"size": 8, "color": "#f6b26b"}, "line": {"color": "#f6b26b", "width": 15}, "name": "Name-calling: 11.9%"}, {"type": "scatter3d", "mode": "lines+markers", "x": [2, 2], "y": [0, 0], "z": [0, 6.0], "marker": {"size": 8, "color": "#e06666"}, "line": {"color": "#e06666", "width": 15}, "name": "Physical: 6.0%"}, {"type": "scatter3d", "mode": "lines+markers", "x": [3, 3], "y": [0, 0], "z": [0, 4.9], "marker": {"size": 8, "color": "#93c47d"}, "line": {"color": "#93c47d", "width": 15}, "name": "Exclusion: 4.9%"}, {"type": "scatter3d", "mode": "lines+markers", "x": [4, 4], "y": [0, 0], "z": [0, 21.6], "marker": {"size": 8, "color": "#8e7cc3"}, "line": {"color": "#8e7cc3", "width": 15}, "name": "Cyberbullying: 21.6%"}];
+
+// Create the plot directly with the embedded data
+Plotly.newPlot('plotly-div', data, layout, {responsive: true});
+
+// p5.js flying dots animation
+let dots = [];
+function setup() {
+  let cnv = createCanvas(windowWidth, windowHeight);
+  cnv.id('p5-canvas');
+  for (let i = 0; i < 30; i++) {
+    dots.push({
+      x: random(width),
+      y: random(height),
+      dx: random(-2,2),
+      dy: random(-2,2),
+      r: random(6,12)
+    });
+  }
+  noStroke();
+}
+
+function draw() {
+  clear();
+  for (let dot of dots) {
+    fill(255, 255, 0, 180);
+    ellipse(dot.x, dot.y, dot.r);
+    dot.x += dot.dx;
+    dot.y += dot.dy;
+    if (dot.x < 0 || dot.x > width) dot.dx *= -1;
+    if (dot.y < 0 || dot.y > height) dot.dy *= -1;
+  }
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+</script>
+</body>
+</html>
